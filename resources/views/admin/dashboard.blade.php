@@ -6,13 +6,6 @@
 
 <div class="space-y-8">
 
-    {{-- <?php dd([
-            'php_now' => now()->toDateTimeString(),
-            'php_today' => now()->toDateString(),
-            'timezone' => config('app.timezone'),
-        ]);
-    ?> --}}
-
     {{-- SUMMARY --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white rounded-xl shadow p-6">
@@ -31,30 +24,46 @@
         </div>
     </div>
 
-    {{-- ================= ANTRIAN HARI INI (AKTIF) ================= --}}
+    {{-- ================= ANTRIAN HARI INI ================= --}}
     <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-lg font-semibold mb-4">📅 Antrian Hari Ini (Aktif)</h2>
+        <h2 class="text-lg font-semibold mb-4">📅 Antrian Hari Ini</h2>
 
         @forelse ($antrian_hari_ini as $item)
-            <div class="flex justify-between items-center border-b py-3 text-sm">
+            <div class="flex justify-between items-start border-b py-4 text-sm">
+
                 <div>
                     <p class="font-semibold">
                         #{{ $item->nomor_antrian }}
                         <span class="text-gray-500">
-                            ({{ $item->cabang->nama ?? '-' }})
+                            ({{ $item->cabang->nama }})
                         </span>
                     </p>
-                    <p class="text-gray-600 text-xs">
+
+                    <p class="text-xs text-gray-600">
                         {{ $item->user->name ?? '-' }}
+                    </p>
+
+                    <p class="text-xs text-gray-700 mt-1">
+                        <b>Layanan:</b>
+                        {{ $item->layanan->pluck('nama')->join(', ') }}
+                    </p>
+
+                    <p class="text-xs text-blue-600 mt-1">
+                        <b>Estimasi:</b>
+                        {{ $item->estimasi_mulai->format('H:i') }}
+                        –
+                        {{ $item->estimasi_selesai->format('H:i') }}
+                        ({{ $item->durasi_total }} menit)
                     </p>
                 </div>
 
-                <div class="text-right space-y-1">
-                    <p class="font-medium">
-                        {{ optional($item->waktu_masuk)->format('H:i') ?? '-' }}
+                <div class="text-right space-y-2">
+                    <p class="text-xs text-gray-500">
+                        Masuk:
+                        {{ optional($item->waktu_masuk)->format('H:i') }}
                     </p>
 
-                    {{-- DROPDOWN STATUS --}}
+                    {{-- STATUS --}}
                     <form action="{{ route('admin.antrian.update-status', $item->id) }}" method="POST">
                         @csrf
                         <select name="status"
@@ -70,6 +79,7 @@
                         </select>
                     </form>
                 </div>
+
             </div>
         @empty
             <p class="text-gray-500 text-sm text-center py-6">
@@ -78,7 +88,7 @@
         @endforelse
     </div>
 
-    {{-- ================= ANTRIAN SELESAI HARI INI ================= --}}
+    {{-- ================= SELESAI ================= --}}
     <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-lg font-semibold mb-4 text-green-600">
             ✅ Antrian Selesai Hari Ini
@@ -89,21 +99,13 @@
                 <div>
                     <p class="font-semibold">
                         #{{ $item->nomor_antrian }}
-                        <span class="text-gray-500">
-                            ({{ $item->cabang->nama ?? '-' }})
-                        </span>
-                    </p>
-                    <p class="text-gray-600 text-xs">
-                        {{ $item->user->name ?? '-' }}
+                        ({{ $item->user->name ?? '-' }})
                     </p>
                 </div>
 
                 <div class="text-right">
                     <p class="font-medium text-green-600">
-                        {{ optional($item->waktu_keluar)->format('H:i') ?? '-' }}
-                    </p>
-                    <p class="text-xs text-gray-500">
-                        Selesai
+                        {{ optional($item->waktu_keluar)->format('H:i') }}
                     </p>
                 </div>
             </div>
@@ -114,7 +116,7 @@
         @endforelse
     </div>
 
-    {{-- ================= ANTRIAN HARI DEPAN ================= --}}
+    {{-- ================= HARI DEPAN ================= --}}
     <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-lg font-semibold mb-4">⏭️ Antrian Hari Ke Depan</h2>
 
@@ -123,18 +125,16 @@
                 <div>
                     <p class="font-semibold">
                         #{{ $item->nomor_antrian }}
-                        <span class="text-gray-500">
-                            ({{ $item->cabang->nama ?? '-' }})
-                        </span>
+                        ({{ $item->user->name ?? '-' }})
                     </p>
-                    <p class="text-gray-600 text-xs">
-                        {{ $item->user->name ?? '-' }}
+                    <p class="text-xs text-gray-600">
+                        {{ $item->layanan->pluck('nama')->join(', ') }}
                     </p>
                 </div>
 
                 <div class="text-right">
                     <p class="font-medium">
-                        {{ optional($item->waktu_masuk)->format('d M Y H:i') ?? '-' }}
+                        {{ optional($item->waktu_masuk)->format('d M Y H:i') }}
                     </p>
                     <p class="text-xs text-gray-500">
                         {{ ucfirst($item->status) }}

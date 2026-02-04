@@ -8,6 +8,7 @@
     <meta name="author" content="BikeServe">
     <title>BikeServe | Bengkel Motor Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -74,7 +75,7 @@
             <div class="flex items-center gap-4">
                 <a href="tel:+623112345678" class="hidden md:flex items-center gap-2 text-gray-700 hover:text-red-600">
                     <i class="fas fa-phone"></i>
-                    <span class="font-medium">(031) 1234-5678</span>
+                    <span class="font-medium">0882-1402-9666</span>
                 </a>
                 <a href="/login" class="bg-red-600 text-white px-5 py-2 rounded font-semibold hover:bg-red-700 transition-colors">
                     <i class="fas fa-user mr-2"></i>Login
@@ -95,7 +96,7 @@
                 <a href="#testimonials" class="block py-2 text-gray-700 hover:text-red-600 font-medium">Testimoni</a>
                 <a href="#contact" class="block py-2 text-gray-700 hover:text-red-600 font-medium">Kontak</a>
                 <a href="tel:+623112345678" class="block py-2 text-gray-700 hover:text-red-600 font-medium">
-                    <i class="fas fa-phone mr-2"></i>(031) 1234-5678
+                    <i class="fas fa-phone mr-2"></i> 0882-1402-9666
                 </a>
             </div>
         </div>
@@ -617,7 +618,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-phone text-red-500"></i>
-                            <span>(031) 1234-5678</span>
+                            <span>0882-1402-9666</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-envelope text-red-500"></i>

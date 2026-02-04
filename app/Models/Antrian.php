@@ -10,7 +10,7 @@ class Antrian extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'antrian'; 
+    protected $table = 'antrian';
 
     protected $fillable = [
         'nomor_antrian',
@@ -20,6 +20,11 @@ class Antrian extends Model
         'datang_nanti',
         'waktu_masuk',
         'waktu_keluar'
+    ];
+
+    protected $casts = [
+        'waktu_masuk' => 'datetime',
+        'waktu_keluar' => 'datetime',
     ];
 
     public function cabang()
@@ -32,8 +37,14 @@ class Antrian extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected $casts = [
-        'waktu_masuk' => 'datetime',
-        'waktu_keluar' => 'datetime',
-    ];
+    // ✅ RELASI YANG BENAR
+    public function layanan()
+    {
+        return $this->belongsToMany(
+            Layanan::class,      // ⬅️ BUKAN AntrianLayanan
+            'antrian_layanan',   // pivot table
+            'antrian_id',        // FK ke antrian
+            'layanan_id'         // FK ke layanan
+        );
+    }
 }

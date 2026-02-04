@@ -6,6 +6,7 @@ use App\Models\Antrian;
 use App\Models\Cabang;
 use App\Models\Customer;
 use App\Models\Kendaraan;
+use App\Models\Layanan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,23 +33,61 @@ class CustomerController extends Controller
 
         $customerId = $user->customer->id;
 
+        // kendaraan customer
         $kendaraan = Kendaraan::where('customer_id', $customerId)->get();
 
-        // 🔴 ambil antrian HARI INI saja (semua cabang, untuk display)
-        $antrian = Antrian::whereDate('created_at', today())
+        // ambil antrian hari ini + relasi cabang & layanan
+        $antrianRaw = Antrian::with(['cabang', 'layanan'])
+            ->whereDate('waktu_masuk', today())
+            ->orderBy('cabang_id')
             ->orderBy('nomor_antrian')
-            ->get()
-            ->map(function ($item) use ($userId) {
-                $item->is_mine = $item->user_id === $userId;
-                return $item;
+            ->get();
+
+        $antrian = collect();
+
+        $antrianRaw
+            ->groupBy('cabang_id')
+            ->each(function ($items) use (&$antrian, $userId) {
+
+                $cabang = $items->first()->cabang;
+
+                // ✅ FIX PALING AMAN
+                $jamBuka = Carbon::parse($cabang->jam_buka)->setDate(
+                    now()->year,
+                    now()->month,
+                    now()->day
+                );
+
+                $waktuMasukPertama = Carbon::parse(
+                    $items->first()->waktu_masuk
+                );
+
+                // START TIME
+                $currentTime = $jamBuka->greaterThan($waktuMasukPertama)
+                    ? $jamBuka
+                    : $waktuMasukPertama;
+
+                foreach ($items as $item) {
+
+                    $durasi = $item->layanan->sum('durasi_menit');
+
+                    $item->estimasi_mulai   = $currentTime->copy();
+                    $item->estimasi_selesai = $currentTime->copy()->addMinutes($durasi);
+                    $item->durasi_total     = $durasi;
+                    $item->is_mine          = $item->user_id === $userId;
+
+                    $currentTime = $item->estimasi_selesai;
+
+                    $antrian->push($item);
+                }
             });
 
-        $cabang = Cabang::all();
 
         return view('customer.dashboard', [
             'kendaraan' => $kendaraan,
             'antrian'   => $antrian,
-            'cabang'    => $cabang,
+            'cabang'    => Cabang::all(),
+            'layanan'   => Layanan::orderBy('kategori')->get(),
         ]);
     }
 
@@ -57,6 +96,8 @@ class CustomerController extends Controller
         $request->validate([
             'cabang_id'    => 'required|exists:cabangs,id',
             'kendaraan_id' => 'required|exists:kendaraan,id',
+            'layanan_id'   => 'required|array|min:1',
+            'layanan_id.*' => 'exists:layanan,id',
             'datang_nanti' => 'nullable|boolean',
             'waktu_masuk'  => 'nullable|date'
         ]);
@@ -79,12 +120,11 @@ class CustomerController extends Controller
 
             $datangNanti = (int) ($request->datang_nanti ?? 0);
 
-            // tentukan tanggal antrian (hari ini / hari datang)
             $tanggalAntrian = $datangNanti === 1
                 ? Carbon::parse($request->waktu_masuk)->toDateString()
                 : now()->toDateString();
 
-            // lock antrian per cabang + tanggal
+            // lock nomor antrian per cabang + tanggal
             $lastAntrian = Antrian::where('cabang_id', $request->cabang_id)
                 ->whereDate('waktu_masuk', $tanggalAntrian)
                 ->lockForUpdate()
@@ -95,11 +135,11 @@ class CustomerController extends Controller
                 ? $lastAntrian->nomor_antrian + 1
                 : 1;
 
-            // normalisasi datetime
             $waktuMasuk = $datangNanti === 1
                 ? Carbon::parse($request->waktu_masuk)->format('Y-m-d H:i:s')
                 : now();
 
+            // buat antrian
             $antrian = Antrian::create([
                 'cabang_id'     => $request->cabang_id,
                 'user_id'       => $user->id,
@@ -117,14 +157,27 @@ class CustomerController extends Controller
                 'updated_at'   => now(),
             ]);
 
+            // simpan layanan + hitung estimasi
+            $layanan = Layanan::whereIn('id', $request->layanan_id)->get();
+            $totalDurasi = 0;
+
+            foreach ($layanan as $l) {
+                DB::table('antrian_layanan')->insert([
+                    'antrian_id' => $antrian->id,
+                    'layanan_id' => $l->id,
+                ]);
+
+                $totalDurasi += $l->durasi_menit;
+            }
+
             DB::commit();
 
             return response()->json([
                 'message' => 'Antrian berhasil dibuat',
                 'data' => [
-                    'nomor_antrian' => $antrian->nomor_antrian,
-                    'waktu_masuk'   => $antrian->waktu_masuk,
-                    'datang_nanti'  => $antrian->datang_nanti,
+                    'nomor_antrian'  => $antrian->nomor_antrian,
+                    'estimasi_menit' => $totalDurasi,
+                    'waktu_masuk'    => $antrian->waktu_masuk,
                 ]
             ], 201);
 
@@ -132,7 +185,7 @@ class CustomerController extends Controller
             DB::rollBack();
 
             Log::error('STORE ANTRIAN ERROR', [
-                'error' => $th->getMessage(),
+                'error' => $th->getMessage()
             ]);
 
             return response()->json([

@@ -17,44 +17,87 @@ class AdminController extends Controller
         try {
             $user = Auth::user();
 
-            // pastikan user punya cabang
+            // pastikan admin punya cabang
             if (!$user->cabang_id) {
                 abort(403, 'User tidak memiliki cabang');
             }
 
             $cabangId = $user->cabang_id;
 
-            // RANGE HARI INI (AMAN JAM)
-            $startToday = Carbon::today()->startOfDay(); // 00:00:00
-            $endToday   = Carbon::today()->endOfDay();   // 23:59:59
+            $startToday = Carbon::today()->startOfDay();
+            $endToday   = Carbon::today()->endOfDay();
+
+            /**
+             * ================= AMBIL DATA =================
+             */
+            $antrianHariIniRaw = Antrian::with(['cabang', 'user', 'layanan'])
+                ->where('cabang_id', $cabangId)
+                ->whereBetween('waktu_masuk', [$startToday, $endToday])
+                ->whereIn('status', ['menunggu', 'diproses'])
+                ->orderBy('nomor_antrian')
+                ->get();
+
+            $antrianSelesaiHariIni = Antrian::with(['cabang', 'user', 'layanan'])
+                ->where('cabang_id', $cabangId)
+                ->whereBetween('waktu_masuk', [$startToday, $endToday])
+                ->where('status', 'selesai')
+                ->orderByDesc('waktu_keluar')
+                ->get();
+
+            $antrianHariDepan = Antrian::with(['cabang', 'user', 'layanan'])
+                ->where('cabang_id', $cabangId)
+                ->where('waktu_masuk', '>', $endToday)
+                ->where('status', '!=', 'batal')
+                ->orderBy('waktu_masuk')
+                ->get();
+
+            /**
+             * ================= HITUNG ESTIMASI (AKTIF) =================
+             * start dari JAM BUKA CABANG
+             */
+            $antrianHariIni = collect();
+
+            if ($antrianHariIniRaw->count() > 0) {
+
+                $cabang = $antrianHariIniRaw->first()->cabang;
+
+                // jam buka cabang (aman apapun format DB)
+                $jamBuka = Carbon::parse($cabang->jam_buka)->setDate(
+                    now()->year,
+                    now()->month,
+                    now()->day
+                );
+
+                $waktuMasukPertama = Carbon::parse(
+                    $antrianHariIniRaw->first()->waktu_masuk
+                );
+
+                // start time = max(jam buka, waktu masuk pertama)
+                $currentTime = $jamBuka->greaterThan($waktuMasukPertama)
+                    ? $jamBuka
+                    : $waktuMasukPertama;
+
+                foreach ($antrianHariIniRaw as $item) {
+
+                    $durasi = $item->layanan->sum('durasi_menit');
+
+                    $item->estimasi_mulai   = $currentTime->copy();
+                    $item->estimasi_selesai = $currentTime->copy()->addMinutes($durasi);
+                    $item->durasi_total     = $durasi;
+
+                    $currentTime = $item->estimasi_selesai;
+
+                    $antrianHariIni->push($item);
+                }
+            }
 
             return view('admin.dashboard', [
                 'user_count' => User::where('role', 'user')->count(),
-
-                // ================= HARI INI (AKTIF) =================
-                'antrian_hari_ini' => Antrian::with(['cabang', 'user'])
-                    ->where('cabang_id', $cabangId)
-                    ->whereBetween('waktu_masuk', [$startToday, $endToday])
-                    ->whereIn('status', ['menunggu', 'diproses'])
-                    ->orderBy('waktu_masuk')
-                    ->get(),
-
-                // ================= HARI INI (SELESAI) =================
-                'antrian_selesai_hari_ini' => Antrian::with(['cabang', 'user'])
-                    ->where('cabang_id', $cabangId)
-                    ->whereBetween('waktu_masuk', [$startToday, $endToday])
-                    ->where('status', 'selesai')
-                    ->orderByDesc('waktu_keluar')
-                    ->get(),
-
-                // ================= HARI DEPAN =================
-                'antrian_hari_depan' => Antrian::with(['cabang', 'user'])
-                    ->where('cabang_id', $cabangId)
-                    ->where('waktu_masuk', '>', $endToday)
-                    ->where('status', '!=', 'batal')
-                    ->orderBy('waktu_masuk')
-                    ->get(),
+                'antrian_hari_ini' => $antrianHariIni,
+                'antrian_selesai_hari_ini' => $antrianSelesaiHariIni,
+                'antrian_hari_depan' => $antrianHariDepan,
             ]);
+
         } catch (\Throwable $th) {
             dd($th->getMessage());
         }
