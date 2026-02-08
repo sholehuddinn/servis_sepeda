@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/login-clear', [WelcomeController::class, 'clearAndLogin'])->name('login.clear');
 
     Route::get('/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard');
 

@@ -77,7 +77,7 @@
                     <i class="fas fa-phone"></i>
                     <span class="font-medium">0882-1402-9666</span>
                 </a>
-                <a href="/login" class="bg-red-600 text-white px-5 py-2 rounded font-semibold hover:bg-red-700 transition-colors">
+                <a href="{{ route('login.clear') }}" class="bg-red-600 text-white px-5 py-2 rounded font-semibold hover:bg-red-700 transition-colors">
                     <i class="fas fa-user mr-2"></i>Login
                 </a>
                 <button class="lg:hidden text-gray-700" id="mobile-menu-button">
