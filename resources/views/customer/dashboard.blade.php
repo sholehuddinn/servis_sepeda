@@ -104,7 +104,7 @@
                 <select id="cabang_id" class="w-full rounded-lg border-gray-300">
                     <option value="">-- Pilih Cabang --</option>
                     @foreach ($cabang as $c)
-                        <option value="{{ $c->id }}">{{ $c->nama }}</option>
+                        <option value="{{ $c->id }}">{{ $c->nama }} - {{ $c->alamat }}</option>
                     @endforeach
                 </select>
             </div>
