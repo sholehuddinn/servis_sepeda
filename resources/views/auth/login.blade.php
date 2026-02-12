@@ -198,20 +198,6 @@
                             </div>
                         </div>
 
-                        <!-- Social Login (Optional) -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <button type="button" 
-                                    class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                <i class="fab fa-google text-red-600 mr-2"></i>
-                                <span class="text-sm font-medium text-gray-700">Google</span>
-                            </button>
-                            <button type="button" 
-                                    class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                <i class="fab fa-facebook text-blue-600 mr-2"></i>
-                                <span class="text-sm font-medium text-gray-700">Facebook</span>
-                            </button>
-                        </div>
-
                         <!-- Register Link -->
                         <div class="text-center pt-4">
                             <p class="text-sm text-gray-600">
@@ -223,22 +209,6 @@
                             </p>
                         </div>
                     </form>
-                </div>
-
-                <!-- Security Badges -->
-                <div class="mt-8 grid grid-cols-3 gap-4 text-center">
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="fas fa-lock text-green-600 text-xl mb-2"></i>
-                        <p class="text-xs text-gray-600 font-medium">SSL Secure</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="fas fa-user-shield text-blue-600 text-xl mb-2"></i>
-                        <p class="text-xs text-gray-600 font-medium">Data Protected</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="fas fa-shield-alt text-purple-600 text-xl mb-2"></i>
-                        <p class="text-xs text-gray-600 font-medium">GDPR Ready</p>
-                    </div>
                 </div>
 
                 <!-- Back to Home -->

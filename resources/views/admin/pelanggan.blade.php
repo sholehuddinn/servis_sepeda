@@ -18,44 +18,64 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telepon</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kendaraan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach ($pelanggan as $user)
-                        @foreach ($user->customer as $customer)
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                                            <span class="text-sm font-medium text-red-600">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-900">{{ $user->name }}</span>
+                        @php
+                            $customer = $user->customer;
+                        @endphp
+
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-sm font-medium text-red-600">
+                                            {{ strtoupper(substr($user->name, 0, 2)) }}
+                                        </span>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-700">{{ $customer->telepon ?? '0' }}</td>
-                                <td class="px-6 py-4">
-                                    @isset($customer->kendaraan)
-                                        @if ($customer->kendaraan->count() > 0)
-                                            <div class="space-y-2">
-                                                @foreach ($customer->kendaraan as $kendaraan)
-                                                    <div class="text-sm">
-                                                        <div class="font-medium text-gray-900">{{ $kendaraan->tipe }}</div>
-                                                        <div class="text-gray-600">{{ $kendaraan->brand }} - {{ $kendaraan->model }}</div>
-                                                        <div class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">
-                                                            {{ $kendaraan->plat_nomor }}
-                                                        </div>
-                                                    </div>
-                                                @endforeach
+                                    <span class="text-sm font-medium text-gray-900">
+                                        {{ $user->name }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                {{ $user->email }}
+                            </td>
+
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                {{ $customer?->telepon ?? '-' }}
+                            </td>
+                            
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                {{ $customer?->alamat ?? '-' }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                @if ($customer && $customer->kendaraan->count() > 0)
+                                    <div class="space-y-2">
+                                        @foreach ($customer->kendaraan as $kendaraan)
+                                            <div class="text-sm">
+                                                <div class="font-medium text-gray-900">
+                                                    {{ $kendaraan->tipe }}
+                                                </div>
+                                                <div class="text-gray-600">
+                                                    {{ $kendaraan->brand }} - {{ $kendaraan->model }}
+                                                </div>
+                                                <div class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">
+                                                    {{ $kendaraan->plat_nomor }}
+                                                </div>
                                             </div>
-                                        @else
-                                            <span class="text-sm text-gray-400">-</span>
-                                        @endif
-                                    @endisset
-                                </td>
-                            </tr>
-                        @endforeach
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-sm text-gray-400">-</span>
+                                @endif
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>

@@ -279,20 +279,6 @@
                             </div>
                         </div>
 
-                        <!-- Social Registration -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <button type="button" 
-                                    class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                <i class="fab fa-google text-red-600 mr-2"></i>
-                                <span class="text-sm font-medium text-gray-700">Google</span>
-                            </button>
-                            <button type="button" 
-                                    class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                <i class="fab fa-facebook text-blue-600 mr-2"></i>
-                                <span class="text-sm font-medium text-gray-700">Facebook</span>
-                            </button>
-                        </div>
-
                         <!-- Login Link -->
                         <div class="text-center pt-4">
                             <p class="text-sm text-gray-600">
@@ -304,24 +290,6 @@
                             </p>
                         </div>
                     </form>
-                </div>
-
-                <!-- Security Assurance -->
-                <div class="mt-8 text-center">
-                    <div class="inline-flex items-center space-x-6 text-gray-600 text-sm">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-shield-alt text-green-500"></i>
-                            <span>Data Anda Aman</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-clock text-blue-500"></i>
-                            <span>Pendaftaran Gratis</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-question-circle text-purple-500"></i>
-                            <span>Bantuan 24/7</span>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Back to Home -->

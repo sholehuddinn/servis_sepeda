@@ -90,18 +90,6 @@
                 <span>Pelanggan</span>
             </a>
 
-            <a href="#"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors
-                      text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="3"/>
-                    <line x1="12" y1="2" x2="12" y2="9"/>
-                    <line x1="12" y1="15" x2="12" y2="22"/>
-                </svg>
-                <span>Service</span>
-            </a>
-
             <a href="/admin/layanan"
                class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors
                       text-muted-foreground hover:bg-accent hover:text-accent-foreground">
